@@ -3,42 +3,85 @@ import PyPDF2
 
 
 
+import urllib2
+import PyPDF2
+
+
+
 url= 'https://cran.r-project.org/web/packages/stocks/stocks.pdf'
-script_name = '\Desktop\stocksscript.pdf'
+script_name = 'stocksscript.pdf'
 
 filedata = urllib2.urlopen(url) #download file
 datatowrite = filedata.read()
 
-'''
-with open('C:\Users\NGopal1\Desktop', 'wb') as f:
+
+with open('stockscript.pdf', 'wb') as f:
     f.write(datatowrite)  #write the downloaded file to the given directory
     f.close()
-'''
 
-'''pdfFileObj = open("C:\Users\NGopal1\Desktop\scriptname.pdf", 'rb') #read the pdf
+
+pdfFileObj = open("stockscript.pdf", 'rb') #read the pdf
 pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
 
 number_of_pages = pdfReader.numPages
 whole_pdf_document = [] #initialize a list to hold the pages of the pdf
 pageObj = pdfReader.getPage(0)
-'''
 
-temp_file_handle = open("tempfile.txt", "r")
+#print pdfReader.getPage(0)
+#print pdfReader.getPage(35)
 
-'''for line in range(0,number_of_pages): #iterate through the pdf document, add each page to its own index in the list
+
+
+temp_file_handle = open("tempfile.txt", "w")
+
+for line in range(0,number_of_pages): #iterate through the pdf document, add each page to its own index in the list
      pageObj = pdfReader.getPage(line)
      whole_pdf_document.append(pageObj.extractText())
      temp_file_handle.write(whole_pdf_document[line])
      temp_file_handle.write("*****page break******")
-'''
+
+#print whole_pdf_document
+
+text_file_handle = open('tempfile.txt', 'r')
+
+list = [] #list to hold the names of all of the functions in the documentation
+
+for line in text_file_handle: #iterate through the documentation, save all of the function names and add them to a list
+    if "........." in line:
+        #print line
+        list.append(line[0:line.index('...')])
 
 
-whole_pdf_line_by_line = temp_file_handle.readlines()
 
-for index in whole_pdf_line_by_line:
+text_file_handle = open('tempfile.txt', 'r')
+
+array_of_array_of_strings = []
+
+counter = 1
+
+new_array = []
+
+copy = False
+
+for line in text_file_handle:
+    if "Examples\n" in line:
+        #print 'found examples'
+        new_array = []
+        copy = True
+    if counter < len(list):
+        #print line
+        #print list[counter]
+        if list[counter] in line[0:line.index('\n')]:
+            print new_array
+            counter += 1
+            array_of_array_of_strings.append(new_array)
+            copy = False
+    if '*****page break******' not in line and copy is True:
+        print 'f'
+        new_array.append(line)
 
 
-
+print array_of_array_of_strings[1]
 
 
 
