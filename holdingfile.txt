@@ -1,0 +1,475 @@
+beta_trailing50.Rd
+ list("\n", "# Calculate TLT's beta based on the previous 50 daily gains\n", "beta_trailing50(\"TLT\")\n") 
+ 
+ 
+beta_trailing50.Rd
+ list("\n", "# Calculate TLT's beta based on the previous 50 daily gains\n", "beta_trailing50(\"TLT\")\n") 
+ 
+ 
+contango_hedged.Rd
+# `contango_hedged`: Backtest a Hedged Contango-Based Volatility Trading Strategy
+## Description
+ Implements the following strategy: Each day, hold XIV/SPXU (weighted for zero
+ beta) if contango > `xiv.spxu.cutpoint` , hold VXX/UPRO (weighted for
+ zero beta) if contango < `vxx.upro.cutpoint` , and hold cash otherwise.
+ Perhaps not very useful since XIV closed on Feb. 20, 2018.
+## Usage
+```r
+contango_hedged(contango, xiv.spxu.gains = NULL, vxx.upro.gains = NULL,
+  xiv.spxu.cutpoint = 6.36, vxx.upro.cutpoint = 5.45,
+  xiv.allocation = 0.46, vxx.allocation = 0.46, xiv.beta = NULL,
+  vxx.beta = NULL, initial = 10000)
+```
+## Arguments
+Argument      |Description
+------------- |----------------
+```contango```     |     Numeric vector of contango values at the end of each trading day.
+```xiv.spxu.gains```     |     2-column numeric matrix with gains for XIV and SPXU. Should have the same number of rows as `contango` and be date-shifted one value to the right. For example, the first row should have the XIV and SPXU gains for the day AFTER the first contango value.
+```vxx.upro.gains```     |     2-column numeric matrix with gains for VXX and UPRO. Should have the same number of rows as `contango` and be date-shifted one value to the right. For example, the first row should have the VXX and UPRO gains for the day AFTER the first contango value.
+```xiv.spxu.cutpoint```     |     Numeric value giving the contango cutpoint for XIV/SPXU position. For example, if `xiv.spxu.cutpoint = 5` , XIV/SPXU will be held whenever contango is greater than 5%.
+```vxx.upro.cutpoint```     |     Numeric value giving the contango cutpoint for VXX/UPRO position. For example, if `vxx.upro.cutpoint = -5` , VXX/UPRO will be held whenever contango is less than -5%.
+```xiv.allocation```     |     Numeric value specifying XIV allocation for XIV/SPXU position. For example, if set to 0.46, 46% is allocated to XIV and 54% to SPXU when contango > `xiv.spxu.cutpoint` .
+```vxx.allocation```     |     Numeric value specifying VXX allocation for VXX/UPRO position. For example, if set to 0.46, 46% is allocated to VXX and 54% to UPRO when contango < `vxx.upro.cutpoint` .
+```xiv.beta```     |     Numeric value specifying XIV's beta. If specified, the function figures out what `xiv.allocation` needs to be for zero-beta XIV/SPXU positions. For example, if set to 3.5, then 46.2% XIV/53.8% SPXU achieves zero beta.
+```vxx.beta```     |     Numeric value indicating VXX's beta. If specified, the function figures out what `vxx.allocation` needs to be for zero-beta VXX/UPRO positions. For example, if set to -3.5, then 46.2% VXX/53.8% UPRO achieves zero beta.
+```initial```     |     Numeric value giving the initial value of the portfolio.
+## Details
+ You can find historical contango values from The Intelligent Investor Blog.
+ You can click the first link at
+ [http://investing.kuchita.com/2012/06/28/xiv-data-and-pricing-model-since-vix-futures-available-2004/](http://investing.kuchita.com/2012/06/28/xiv-data-and-pricing-model-since-vix-futures-available-2004/) 
+ to download a zip file containing an Excel spreadsheet. Then, you will need
+ to calculate whatever version of "contango" you prefer. I typically define
+ contango as what percent higher the second-month VIX futures are acompared to
+ the first-month futures, i.e. dividing the "2nd mth" column by the "1st mth"
+ column, subtracting 1, and then multiplying by 100.
+ 
+ To load daily gains for XIV, SPXU, VXX, and UPRO, you can use
+ [`load_gains`](load_gains.html) , which uses the quantmod package to load
+ data from Yahoo! Finance. You will have to specify the `from` and
+ `to` inputs to match the date range for your contango values.
+## Value
+ List containing:
+  
+*  Character vector named `holdings` indicating what fund was held each day (XIV/SPXU, VXX/UPRO, or cash). 
+*  Numeric vector named `port.gains` giving the portfolio gain for each day, which will be 0 for days that cash was held and the weighted XIV/SPXU or VXX/UPRO gain for days that one of those positions was held. 
+*  Numeric vector named `port.balances` giving the portfolio balance each day. 
+*  Numeric value named `trades` giving the total number of trades executed. 
+## References
+ Ryan, J.A. and Ulrich, J.M. (2017) quantmod: Quantitative Financial Modelling
+ Framework. R package version 0.4-12,
+ [https://CRAN.R-project.org/package=quantmod](https://CRAN.R-project.org/package=quantmod) .
+contango_simple.Rd
+# `contango_simple`: Backtest a Simple Contango-Based Volatility Trading Strategy
+## Description
+ Simple strategy: Each day, hold XIV if contango > `xiv.cutpoint` , hold
+ VXX if contango < `vxx.cutpoint` , and hold cash otherwise. Perhaps not
+ very useful since XIV closed on Feb. 20, 2018.
+## Usage
+```r
+contango_simple(contango, xiv.gains = NULL, vxx.gains = NULL,
+  xiv.cutpoint = 0, vxx.cutpoint = -Inf, initial = 10000)
+```
+## Arguments
+Argument      |Description
+------------- |----------------
+```contango```     |     Numeric vector of contango values at the end of each trading day.
+```xiv.gains```     |     Numeric vector of gains for XIV. Should be same length as `contango` and date-shifted one value to the right. For example, the first value of `xiv.gains` should be the XIV gain for the day AFTER the first contango value.
+```vxx.gains```     |     Numeric vector of gains for VXX. Should be same length as `contango` and date-shifted one value to the right. For example, the first value of `vxx.gains` should be the VXX gain for the day AFTER the first contango value.
+```xiv.cutpoint```     |     Numeric value giving the contango cutpoint for XIV, in percent.
+```vxx.cutpoint```     |     Numeric value giving the contango cutpoint for VXX, in percent.
+```initial```     |     Numeric value giving the initial value of the portfolio.
+## Details
+ You can find historical contango values from The Intelligent Investor Blog.
+ You can click the first link at [http://investing.kuchita.com/2012/06/28/xiv-data-and-pricing-model-since-vix-futures-available-2004/](http://investing.kuchita.com/2012/06/28/xiv-data-and-pricing-model-since-vix-futures-available-2004/) to download a zip file containing an Excel spreadsheet. Then,
+ you will need to calculate whatever version of "contango" you prefer. I
+ typically define contango as what percent higher the second-month VIX futures
+ are acompared to the first-month futures, i.e. dividing the "2nd mth" column
+ by the "1st mth" column, subtracting 1, and then multiplying by 100.
+ 
+ I think the most common approach for contango-based volatility strategies is
+ holding XIV (inverse volatility) when contango is above some value (e.g. 0%,
+ 5%, or 10%), and holding cash otherwise. You can do that with this function
+ by leaving `vxx.cutpoint` as `-Inf` . However, you may also want to
+ hold VXX (volatility) when contango is below some value
+ (e.g. 0%, -5%, -10%), also known as "backwardation". You can implement an
+ XIV-only, VXX-only, or XIV and VXX strategy with this function.
+ 
+ To load daily gains for XIV and/or VXX, you can use [`load_gains`](load_gains.html) ,
+ which uses the quantmod package [1] to load data from Yahoo! Finance.
+ You will have to specify the `from` and `to` inputs to match the
+ date range for your contango values.
+## Value
+ List containing:
+  
+*  Character vector named `holdings` indicating what fund was held each day (XIV, VXX, or cash). 
+*  Numeric vector named `port.gains` giving the portfolio gain for each day, which will be 0 for days that cash was held and the XIV or VXX gain for days that XIV or VXX was held. 
+*  Numeric vector named `port.balances` giving the portfolio balance each day. 
+*  Numeric value named `trades` giving the total number of trades executed. 
+## References
+ Ryan, J.A. and Ulrich, J.M. (2017) quantmod: Quantitative Financial Modelling
+ Framework. R package version 0.4-12,
+ [https://CRAN.R-project.org/package=quantmod](https://CRAN.R-project.org/package=quantmod) .
+convert_gain.Rd
+ # Calculate annualized gain for an 8% gain over a 70-day period
+ convert_gain(gain = 0.08, units.in = 70, units.out = 252)
+ 
+ # Calculate the annual growth rate of a fund that gains 0.02% per day
+ convert_gain(gain = 0.0002, units.in = 1, units.out = 252)
+ 
+ # Calculate the annual growth rate of a fund that gains 1% per week
+ convert_gain(gain = 0.01, units.in = 1, units.out = 52)
+ 
+ # You invest in AAPL and gain 0.5% in 17 business days. Express as a 5-year
+ # growth rate.
+ convert_gain(gain = 0.005, units.in = 17, units.out = 252 * 5)
+ 
+ # Your portfolio has tripled in a 13-year period. Calculate your average
+ # annual gain.
+ convert_gain(gain = 2, units.in = 13, units.out = 1)
+ 
+ 
+daily_yearly.Rd
+ # Calculate annual gain for an investment that gains 0.1% per day
+ daily_yearly(gain = 0.001)
+ 
+ # Calculate 5-year gains corresponding to various daily gains
+ daily_yearly(gain = seq(0, 0.001, 0.0001), years = 5)
+ 
+ 
+diffs.Rd
+ # Generate 1 million values from Poisson(3) distribution
+ x <- rpois(100000, 3)
+ 
+ # Calculate vector of differences between subsequent values
+ y <- diffs(x)
+ 
+ # Could get same result from base R function diff
+ z <- diff(x)
+ all.equal(y, z)
+ 
+ # But diffs is faster
+ benchmark(diffs(x), diff(x), replications = 100)
+ 
+ 
+gains_graph.Rd
+ list("\n", "# Plot daily gains for SSO and UPRO vs. VFINX\n", "fig <- gains_graph(c(\"VFINX\", \"SSO\", \"UPRO\"))\n") 
+ 
+gains_prices.Rd
+ # Simulate daily gains over a 5-year period
+ set.seed(123)
+ gains <- rnorm(n = 252 * 5, mean = 0.001, sd = 0.02)
+ 
+ # Plot balance over time if initial balance is $10,000
+ prices <- gains_prices(gains)
+ plot(prices)
+ 
+ 
+gains_rate.Rd
+ # Create vector of daily gains for a hypothetical stock
+ daily.gains <- c(-0.02, -0.01, 0.01, 0.02, 0.01)
+ 
+ # Overall growth is 0.95%
+ gains_rate(daily.gains)
+ 
+ # Average daily growth is 0.19%
+ gains_rate(daily.gains, 1)
+ 
+ # Corresponds to 61.0% annual growth
+ gains_rate(daily.gains, 252)
+ 
+ 
+growth_graph.Rd
+ list("\n", "# Plot growth of $10k in VFINX and BRK-B\n", "fig <- growth_graph(c(\"VFINX\", \"BRK-B\"))\n") 
+ 
+highyield_etfs.Rd
+# `highyield_etfs`: High-Yield ETFs from ETFdb.com and Inception Dates
+## Description
+ High-Yield ETFs from ETFdb.com and Inception Dates
+largest_etfs.Rd
+# `largest_etfs`: Largest 100 Market Cap ETFs (as of 3/2/18) and Inception Dates
+## Description
+ Largest 100 Market Cap ETFs (as of 3/2/18) and Inception Dates
+load_gains.Rd
+ list("\n", "# Load gains for Netflix and Amazon over their mutual lifetimes\n", "gains <- load_gains(c(\"NFLX\", \"AMZN\"))\n") 
+ 
+ 
+load_prices.Rd
+ list("\n", "# Load prices for Netflix and Amazon over their mutual lifetimes\n", "prices <- load_prices(c(\"NFLX\", \"AMZN\"))\n") 
+ 
+ 
+mdd.Rd
+ list("\n", "# Simulate minute-to-minute stock gains over a 2-year period\n", "set.seed(123)\n", "stock.gains <- rnorm(6.5 * 60 * 252 * 2, 0.000005, 0.001)\n", "\n", "# Convert to stock prices assuming an initial price of $9.50 per share\n", "stock.prices <- gains_prices(gains = stock.gains, initial = 9.50)\n", "\n", "# Plot minute-to-minute stock prices (200k data point, may be slow)\n", "plot(stock.prices)\n", "\n", "# Maximum drawdown based on stock prices\n", "mdd(prices = stock.prices)\n", "\n", 
+    "# Same answer using gains rather than prices\n", "mdd(gains = stock.gains)\n") 
+ 
+ 
+metrics.Rd
+ list("\n", "# Calculate performance metrics for SSO and UPRO, using SPY as benchmark \n", "# for alpha and beta\n", "metrics1 <- metrics(tickers = c(\"SPY\", \"SSO\", \"UPRO\"))\n") 
+ 
+ 
+onemetric_graph.Rd
+ list("\n", "# Compare annualized growth for VFINX, SSO, and UPRO\n", "fig <- onemetric_graph(tickers = c(\"VFINX\", \"SSO\", \"UPRO\"), \n", "                       plot.list = list(ylim = c(0, 50)))\n") 
+ 
+onemetric_overtime_graph.Rd
+ list("\n", "# Plot BRK-B's 50-day alpha over time since the start of 2016\n", "fig <- onemetric_overtime_graph(tickers = c(\"VFINX\", \"BRK-B\"), \n", "                                y.metric = \"alpha\", \n", "                                from = \"2016-01-01\")\n") 
+ 
+pchanges.Rd
+ # Generate 10 values from N(0, 1)
+ x <- rnorm(10)
+ 
+ # Calculate vector of proportion changes between subsequent values
+ (y <- pchanges(x))
+ 
+ # Equivalent base R computation
+ len <- length(x)
+ p1 <- x[2: len]
+ p2 <- x[1: (len - 1)]
+ y2 <- p1 / p2 - 1
+ all.equal(y, y2)
+ 
+ 
+pdiffs.Rd
+ # Generate 10 values from N(0, 1)
+ x <- rnorm(10)
+ 
+ # Calculate vector of proportion differences between subsequent values
+ (y <- pdiffs(x))
+ 
+ # Equivalent base R computation
+ len <- length(x)
+ p1 <- x[2: len]
+ p2 <- x[1: (len - 1)]
+ y2 <- (p1 - p2) / (0.5 * (p1 + p2))
+ all.equal(y, y2)
+ 
+ 
+prices_gains.Rd
+ list("\n", "# Load 2017 prices for Netflix and Amazon, and calculate growth of $10k\n", "prices <- load_prices(c(\"NFLX\", \"AMZN\"), initial = 1000)\n", "\n", "# Calculate gains\n", "gains <- prices_gains(prices)\n") 
+ 
+ 
+prices_rate.Rd
+ # Create vector of daily closing prices for a hypothetical stock
+ prices <- c(100.4, 98.7, 101.3, 101.0, 100.9)
+ 
+ # Overall growth is 0.50%
+ prices_rate(prices)
+ 
+ # Average daily growth is 0.12%
+ prices_rate(prices, 1)
+ 
+ # Corresponds to 36.7% annualized growth
+ prices_rate(prices, 252)
+ 
+ 
+ratios.Rd
+ # Generate 10 values from N(0, 1)
+ x <- rnorm(10)
+ 
+ # Calculate vector of ratios
+ (y <- ratios(x))
+ 
+ # Slower base R computation
+ len <- length(x)
+ y2 <- x[2: len] / x[1: (len - 1)]
+ all.equal(y, y2)
+ 
+ 
+rrr.Rd
+ # Simulate daily gains over a 5-year period
+ set.seed(123)
+ stock.gains <- rnorm(252 * 5, 0.0005, 0.01)
+ 
+ # Convert to daily balances assuming an initial balance of $10,000
+ daily.balances <- gains_prices(stock.gains + 1)
+ 
+ # Total return is about 1.23
+ daily.balances[length(daily.balances)] / daily.balances[1] - 1
+ 
+ # Maximum drawdown is about 0.19
+ mdd(prices = daily.balances)
+ 
+ # Ratio of these two is about 6.48
+ (daily.balances[length(daily.balances)] / daily.balances[1] - 1) /
+ mdd(daily.balances)
+ 
+ # Easier to calculate using rrr function
+ rrr(daily.balances)
+ 
+ 
+sector_spdr_etfs.Rd
+# `sector_spdr_etfs`: Sector SPDR ETFs and Inception Dates
+## Description
+ Sector SPDR ETFs and Inception Dates
+sharpe.Rd
+ # Simulate daily gains over a 5-year period
+ set.seed(123)
+ stock.gains <- rnorm(252 * 5, 0.0005, 0.01)
+ 
+ # Calculate Sharpe ratio using risk-free return of 0
+ sharpe(stock.gains)
+ 
+ 
+sortino.Rd
+ # Simulate daily gains over a 5-year period
+ set.seed(123)
+ stock.gains <- rnorm(252 * 5, 0.0005, 0.01)
+ 
+ # Calculate Sortino ratio using risk-free return of 0
+ sortino(stock.gains)
+ 
+ 
+stocks.Rd
+# `stocks`: Stock Market Analysis
+## Description
+ Functions for analyzing stocks or other investments. Main features are
+ loading and aligning historical data for ticker symbols, calculating
+ performance metrics for individual funds or portfolios (e.g. annualized
+ growth, maximum drawdown, Sharpe/Sortino ratio), and creating graphs. C++
+ code is used to improve processing speed where possible.
+## Details
+ list(list("ll"), list("\n", "Package: ", list(), " stocks ", list(), "\n", "Type: ", list(), " Package ", list(), "\n", "Version: ", list(), " 1.1.4 ", list(), "\n", "Date: ", list(), " 2018-08-30 ", list(), "\n", "License: ", list(), " GPL-3 ", list(), "\n")) 
+ 
+ See [CRAN documentation](https://cran.r-project.org/package=stocks) for
+ full list of functions and the
+ [GitHub page](https://github.com/vandomed/stocks) for an overview of the
+ package with some examples.
+## Author
+ Dane R. Van Domelen list()  list("vandomed@gmail.com") 
+## References
+ Eddelbuettel, D. and Francois, R. (2011) Rcpp: Seamless R and C++
+ Integration. Journal of Statistical Software, 40(8), 1-18.
+ [http://www.jstatsoft.org/v40/i08/](http://www.jstatsoft.org/v40/i08/) .
+ 
+ Eddelbuettel, D. (2013) Seamless R and C++ Integration with Rcpp. Springer,
+ New York. ISBN 978-1-4614-6867-7.
+ 
+ Eddelbuettel, D. and Balamuta, J.J. (2017). Extending R with C++: A Brief
+ Introduction to Rcpp. PeerJ Preprints 5:e3188v1.
+ [https://doi.org/10.7287/peerj.preprints.3188v1](https://doi.org/10.7287/peerj.preprints.3188v1) .
+ 
+ Ryan, J.A. and Ulrich, J.M. (2017) quantmod: Quantitative Financial Modelling
+ Framework. R package version 0.4-12,
+ [https://CRAN.R-project.org/package=quantmod](https://CRAN.R-project.org/package=quantmod) .
+ 
+ Acknowledgment: This material is based upon work supported by the
+ National Science Foundation Graduate Research Fellowship under Grant No.
+ DGE-0940903.
+targetall.Rd
+ list("\n", "# Backtest equal-allocation UPRO/VBLTX/VWEHX strategy\n", "port <- targetall(tickers = c(\"UPRO\", \"VBLTX\", \"VWEHX\"))\n", "plot(port$fund.balances[, \"Portfolio\"])\n") 
+ 
+targetbeta_twofunds.Rd
+ list("\n", "# Backtest zero-beta UPRO/VBLTX strategy\n", "beta0 <- targetbeta_twofunds(tickers = c(\"UPRO\", \"VBLTX\"), target.beta = 0)\n", "plot(beta0$fund.balances[, \"Portfolio\"])\n") 
+ 
+threefunds_graph.Rd
+ list("\n", "# Plot mean vs. SD for UPRO/VBLTX/VWEHX portfolio, and compare to VFINX and \n", "# BRK-B\n", "fig <- threefunds_graph(tickers = c(\"VWEHX\", \"VBLTX\", \"UPRO\"), \n", "                        reference.tickers = c(\"VFINX\", \"BRK-B\"))\n") 
+ 
+ 
+ticker_dates.Rd
+ list("\n", "# See what dates are available for Apple and Amazon\n", "ticker_dates(c(\"AAPL\", \"AMZN\"))\n") 
+ 
+ 
+twofunds_graph.Rd
+ list("\n", "# Plot mean vs. SD for UPRO/VBLTX portfolio, and compare to VFINX and BRK-B\n", "fig1 <- twofunds_graph(tickers = c(\"UPRO\", \"VBLTX\"), \n", "                       reference.tickers = c(\"VFINX\", \"BRK-B\"))\n", "                     \n", "# Same funds, but annualized growth vs. maximum drawdown\n", "fig2 <- twofunds_graph(tickers = c(\"UPRO\", \"VBLTX\"), \n", "                       reference.tickers = c(\"VFINX\", \"BRK-B\"),\n", "                       x.metric = \"mdd\", y.metric = \"cagr\")\n") 
+ 
+twometrics_graph.Rd
+ list("\n", "# Plot annualized growth vs. maximum drawdown for VFINX, SSO, and UPRO\n", "fig <- twometrics_graph(tickers = c(\"VFINX\", \"SSO\", \"UPRO\"))\n") 
+ 
+vanguard_balanced_funds.Rd
+# `vanguard_balanced_funds`: Vanguard Balanced Mutual Funds and Inception Dates
+## Description
+ Vanguard Balanced Mutual Funds and Inception Dates
+vanguard_bond_etfs.Rd
+# `vanguard_bond_etfs`: Vanguard Bond ETFs and Inception Dates
+## Description
+ Vanguard Bond ETFs and Inception Dates
+vanguard_bond_funds.Rd
+# `vanguard_bond_funds`: Vanguard Bond Mutual Funds
+## Description
+ Vanguard Bond Mutual Funds
+vanguard_etfs.Rd
+# `vanguard_etfs`: Vanguard ETFs and Inception Dates
+## Description
+ Vanguard ETFs and Inception Dates
+vanguard_funds.Rd
+# `vanguard_funds`: Vanguard Mutual Funds and Inception Dates
+## Description
+ Vanguard Mutual Funds and Inception Dates
+vanguard_igrade_etfs.Rd
+# `vanguard_igrade_etfs`: Vanguard Investment-grade Bond ETFs and Inception Dates
+## Description
+ Vanguard Investment-grade Bond ETFs and Inception Dates
+vanguard_igrade_funds.Rd
+# `vanguard_igrade_funds`: Vanguard Investment-grade Bond Mutual Funds and Inception Dates
+## Description
+ Vanguard Investment-grade Bond Mutual Funds and Inception Dates
+vanguard_international_etfs.Rd
+# `vanguard_international_etfs`: Vanguard International ETFs and Inception Dates
+## Description
+ Vanguard International ETFs and Inception Dates
+vanguard_international_funds.Rd
+# `vanguard_international_funds`: Vanguard International Mutual Funds and Inception Dates
+## Description
+ Vanguard International Mutual Funds and Inception Dates
+vanguard_largecap_etfs.Rd
+# `vanguard_largecap_etfs`: Vanguard Large-cap Stock ETFs and Inception Dates
+## Description
+ Vanguard Large-cap Stock ETFs and Inception Dates
+vanguard_largecap_funds.Rd
+# `vanguard_largecap_funds`: Vanguard Large-cap Stock Mutual Funds and Inception Dates
+## Description
+ Vanguard Large-cap Stock Mutual Funds and Inception Dates
+vanguard_midcap_etfs.Rd
+# `vanguard_midcap_etfs`: Vanguard Mid-cap Stock ETFs and Inception Dates
+## Description
+ Vanguard Mid-cap Stock ETFs and Inception Dates
+vanguard_midcap_funds.Rd
+# `vanguard_midcap_funds`: Vanguard Mid-cap Stock Mutual Funds and Inception Dates
+## Description
+ Vanguard Mid-cap Stock Mutual Funds and Inception Dates
+vanguard_sector_etfs.Rd
+# `vanguard_sector_etfs`: Vanguard Sector & Specialty ETFs and Inception Dates
+## Description
+ Vanguard Sector & Specialty ETFs and Inception Dates
+vanguard_sector_funds.Rd
+# `vanguard_sector_funds`: Vanguard Sector Mutual Funds and Inception Dates
+## Description
+ Vanguard Sector Mutual Funds and Inception Dates
+vanguard_smallcap_etfs.Rd
+# `vanguard_smallcap_etfs`: Vanguard Small-cap Stock ETFs and Inception Dates
+## Description
+ Vanguard Small-cap Stock ETFs and Inception Dates
+vanguard_smallcap_funds.Rd
+# `vanguard_smallcap_funds`: Vanguard Small-cap Stock Mutual Funds and Inception Dates
+## Description
+ Vanguard Small-cap Stock Mutual Funds and Inception Dates
+vanguard_stock_etfs.Rd
+# `vanguard_stock_etfs`: Vanguard Stock ETFs and Inception Dates
+## Description
+ Vanguard Stock ETFs and Inception Dates
+vanguard_stock_funds.Rd
+# `vanguard_stock_funds`: Vanguard Stock Mutual Funds and Inception Dates
+## Description
+ Vanguard Stock Mutual Funds and Inception Dates
+vanguard_targetdate_funds.Rd
+# `vanguard_targetdate_funds`: Vanguard Target Date Mutual Funds
+## Description
+ Vanguard Target Date Mutual Funds
+vanguard_targetrisk_funds.Rd
+# `vanguard_targetrisk_funds`: Vanguard Target Risk Mutual Funds and Inception Dates
+## Description
+ Vanguard Target Risk Mutual Funds and Inception Dates
+vanguard_taxexempt_bond_funds.Rd
+# `vanguard_taxexempt_bond_funds`: Vanguard Tax-exempt Bond Mutual Funds and Inception Dates
+## Description
+ Vanguard Tax-exempt Bond Mutual Funds and Inception Dates
+vanguard_traditional_funds.Rd
+# `vanguard_traditional_funds`: Vanguard Traditional Mutual Funds and Inception Dates
+## Description
+ Vanguard Traditional Mutual Funds and Inception Dates
+vanguard_treasury_etfs.Rd
+# `vanguard_treasury_etfs`: Vanguard Treasury/Agency Bond ETFs and Inception Dates
+## Description
+ Vanguard Treasury/Agency Bond ETFs and Inception Dates
+vanguard_treasury_funds.Rd
+# `vanguard_treasury_funds`: Vanguard Treasury/Agency Bond Mutual Funds and Inception Dates
+## Description
+ Vanguard Treasury/Agency Bond Mutual Funds and Inception Dates
