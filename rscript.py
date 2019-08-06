@@ -1,13 +1,6 @@
 import urllib2
 import PyPDF2
 
-
-
-import urllib2
-import PyPDF2
-
-
-
 url= 'https://cran.r-project.org/web/packages/stocks/stocks.pdf'
 script_name = 'stocksscript.pdf'
 
@@ -53,35 +46,35 @@ for line in text_file_handle: #iterate through the documentation, save all of th
 
 
 
+
 text_file_handle = open('tempfile.txt', 'r')
 
 array_of_array_of_strings = []
 
-counter = 1
+counter = 0
+line_number = 1
+
 
 new_array = []
 
 copy = False
 
 for line in text_file_handle:
-    if "Examples\n" in line:
-        #print 'found examples'
-        new_array = []
+    if "Examples\n" in line: #start copying when word examples is detected, because we only want example code
         copy = True
-    if counter < len(list):
-        #print line
-        #print list[counter]
-        if list[counter] in line[0:line.index('\n')]:
-            print new_array
-            counter += 1
-            array_of_array_of_strings.append(new_array)
-            copy = False
-    if '*****page break******' not in line and copy is True:
-        print 'f'
+
+
+    if :
+
+
+
+    if '*****page break******' not in line and copy == True:
         new_array.append(line)
 
 
-print array_of_array_of_strings[1]
+    line_number += 1
+
+print array_of_array_of_strings
 
 
 
