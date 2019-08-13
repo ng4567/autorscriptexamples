@@ -57,7 +57,9 @@ def parsefiles():
             copy = False
         elif line == "Description":
             copy = False
-
+        elif line == "Topic" or line == "datasets":
+            copy = False
+            example_code.append("\n")
             has_function_finished = True
         elif has_function_finished == False:
             if line == "*****page break******":
@@ -78,7 +80,10 @@ def parsefiles():
         line_number += 1
 
         if copy == True:
-            example_code.append(line)
+            if "Examples" in line:
+                example_code.append("#"+str(line))
+            else:
+                example_code.append(line)
         else:
             pass
 
