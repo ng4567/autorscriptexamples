@@ -73,7 +73,7 @@ def parsefiles():
                 has_function_finished = True
             elif line_number in function_has_not_finished_protected_lines:
                 copy = True
-        elif "Examples" in line:
+        elif line == "Examples":
             example_code.append("\n")
             copy = True
             has_function_finished = False
